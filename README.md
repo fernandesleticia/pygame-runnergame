@@ -1,2 +1,2 @@
-# pygame-runnergame
-Runner game made in python
+# space-invaders
+Space invaders game made with pygame
