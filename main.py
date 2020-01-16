@@ -29,7 +29,7 @@ enemyImg = pygame.image.load('assets/ufo-64px.png')
 enemyX = random.randint(0, 800)
 enemyY = random.randint(50, 150)
 enemyY_change = 40
-enemyX_change = 0.3
+enemyX_change = 4
 
 def player(x,y):
 	screen.blit(playerImg, (x,y))
@@ -54,9 +54,9 @@ while running:
 
 		if event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_LEFT:
-				playerX_change = -0.3	
+				playerX_change = -5	
 			if event.key == pygame.K_RIGHT:
-				playerX_change = 0.3			
+				playerX_change = 5			
 		if event.type == pygame.KEYUP:
 			if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
 				playerX_change = 0		
@@ -72,10 +72,10 @@ while running:
 	enemyX += enemyX_change
 
 	if enemyX <= 0:
-	   enemyX_change = 0.3
+	   enemyX_change = 4
 	   enemyY += enemyY_change
 	elif enemyX >= 736:
-	   enemyX_change = -0.3 
+	   enemyX_change = -4 
 	   enemyY += enemyY_change
  	 
 
