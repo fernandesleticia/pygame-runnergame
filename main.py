@@ -71,7 +71,10 @@ while running:
 			if event.key == pygame.K_RIGHT:
 				playerX_change = 5		
 			if event.key == pygame.K_SPACE:
-				fire_laser(playerX, laserY)		
+				if laser_state is "ready":
+					laserX = playerX
+					fire_laser(laserX, laserY)	
+					
 		if event.type == pygame.KEYUP:
 			if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
 				playerX_change = 0		
@@ -94,8 +97,11 @@ while running:
 	   enemyY += enemyY_change
 
 	#laser movement
+	if laserY <=0 :
+		laserY = 480
+		laser_state = "ready"
 	if laser_state is "fire":
-		fire_laser(playerX, laserY)
+		fire_laser(laserX, laserY)
 		laserY -= laserY_change
  	 
 
