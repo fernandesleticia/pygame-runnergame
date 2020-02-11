@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 
 # initialize the pygame
 pygame.init()
@@ -9,7 +10,6 @@ screen = pygame.display.set_mode((800, 600))
 
 # background
 background = pygame.image.load('assets/space-background.jpg')
-
 
 #Title and Icon
 pygame.display.set_caption("Space Invaders")
@@ -39,6 +39,7 @@ laserX_change = 0
 laserY_change = 10
 laser_state = "ready"
 
+score = 0
 
 def player(x,y):
 	screen.blit(playerImg, (x,y))
@@ -51,6 +52,14 @@ def fire_laser(x,y):
 	global laser_state
 	laser_state = "fire"
 	screen.blit(laserImg, (x + 16,y + 10))
+
+def isCollision(enemyX, enemyY,laserX,laserY):
+	distance = math.sqrt((math.pow(enemyX-laserX,2)) + (math.pow(enemyY-laserY,2)))
+	if distance < 27:
+		return True
+	else:
+		return False
+
 
 # game loop
 running = True
@@ -103,6 +112,15 @@ while running:
 	if laser_state is "fire":
 		fire_laser(laserX, laserY)
 		laserY -= laserY_change
+
+	#collision
+	collision = isCollision(enemyX, enemyY, laserX, laserY)
+	if collision:
+		laserY = 480
+		laser_state = "ready"	
+		score += 1
+		print(score)
+		
  	 
 
 	player(playerX, playerY)
