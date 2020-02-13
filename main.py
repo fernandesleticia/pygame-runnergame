@@ -1,12 +1,17 @@
 import pygame
-import random
 import math
+import random
+from pygame import mixer
 
 # initialize the pygame
 pygame.init()
 
 # create the screen
 screen = pygame.display.set_mode((800, 600))
+
+# Sound
+# mixer.music.load("assets/background.wav")
+# mixer.music.play(-1)
 
 # background
 background = pygame.image.load('assets/space-background.jpg')
@@ -20,16 +25,24 @@ pygame.display.set_icon(icon)
 
 #player ship
 playerImg = pygame.image.load('assets/space-invaders-player-64px.png')
-playerX = 400
-playerY = 500
+playerX = 370
+playerY = 480
 playerX_change = 0
 
 #player enemy
-enemyImg = pygame.image.load('assets/ufo-64px.png')
-enemyX = random.randint(0, 800)
-enemyY = random.randint(50, 150)
-enemyY_change = 5
-enemyX_change = 1
+enemyImg = []
+enemyX = []
+enemyY = []
+enemyY_change = []
+enemyX_change = []
+num_of_enemies = 4
+
+for i in range(num_of_enemies):
+	enemyImg.append(pygame.image.load('assets/ufo-64px.png'))
+	enemyX.append(random.randint(0, 736))
+	enemyY.append(random.randint(50, 150))
+	enemyY_change.append(4)
+	enemyX_change.append(40)
 
 #laser
 laserImg = pygame.image.load('assets/laser.png')
@@ -39,14 +52,28 @@ laserX_change = 0
 laserY_change = 10
 laser_state = "ready"
 
-score = 0
+score_value = 0
+font = pygame.font.Font('assets/FreeSansBold.ttf', 32)
+
+textX = 10
+testY = 10
+
+#Game Over
+over_font = pygame.font.Font('assets/FreeSansBold.ttf', 64)
+
+def show_score(x, y):
+    score = font.render("Score : " + str(score_value), True, (255, 255, 255))
+    screen.blit(score, (x, y))
+
+def game_over_text():
+    over_text = over_font.render("GAME OVER", True, (255, 255, 255))
+    screen.blit(over_text, (200, 250))
 
 def player(x,y):
 	screen.blit(playerImg, (x,y))
 
-
-def enemy(x,y):
-	screen.blit(enemyImg, (x,y))
+def enemy(x,y,i):
+	screen.blit(enemyImg[i], (x, y))
 
 def fire_laser(x,y):
 	global laser_state
@@ -81,6 +108,8 @@ while running:
 				playerX_change = 5		
 			if event.key == pygame.K_SPACE:
 				if laser_state is "ready":
+					# bulletSound = mixer.Sound("assets/laser.wav")
+					# bulletSound.play()
 					laserX = playerX
 					fire_laser(laserX, laserY)	
 					
@@ -96,34 +125,48 @@ while running:
 	elif playerX >= 736:
 		playerX = 736  
 
-	enemyX += enemyX_change
+    # enemy movement
+	for i in range(num_of_enemies):
 
-	if enemyX <= 0:
-	   enemyX_change = 3
-	   enemyY += enemyY_change
-	elif enemyX >= 736:
-	   enemyX_change = -3
-	   enemyY += enemyY_change
+		# Game Over
+		if enemyY[i] > 440:
+			for j in range(num_of_enemies):
+				enemyY[j] = 2000
+			game_over_text()
+			break
 
+		enemyX[i] += enemyX_change[i]
+		if enemyX[i] <= 0:
+			enemyX_change[i] = 3
+			enemyY[i] += enemyY_change[i]
+		elif enemyX[i] >= 736:
+			enemyX_change[i] = -3
+			enemyY[i] += enemyY_change[i]
+
+		#collision
+		collision = isCollision(enemyX[i], enemyY[i], laserX, laserY)
+		if collision:
+			# explosionSound = mixer.Sound("assets/explosion.wav")
+			# explosionSound.play()
+			laserY = 480
+			laser_state = "ready"	
+			score_value += 1
+			enemyX[i] = random.randint(0, 736)
+			enemyY[i] = random.randint(50, 150)
+
+		enemy(enemyX[i], enemyY[i], i)
+  
 	#laser movement
 	if laserY <=0 :
 		laserY = 480
 		laser_state = "ready"
+
 	if laser_state is "fire":
 		fire_laser(laserX, laserY)
 		laserY -= laserY_change
 
-	#collision
-	collision = isCollision(enemyX, enemyY, laserX, laserY)
-	if collision:
-		laserY = 480
-		laser_state = "ready"	
-		score += 1
-		print(score)
-		
- 	 
-
+	
 	player(playerX, playerY)
-	enemy(enemyX, enemyY)
+	show_score(textX, testY)
 	pygame.display.update()
 
